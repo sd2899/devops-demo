@@ -1,0 +1,30 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('checkout') {
+            steps {
+                checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/sd2899/pythondemo.git']])
+            }
+        }
+        stage('build') {
+            steps{
+                sh 'docker build . -t demopython'
+            }
+        }
+        stage('deploy') {
+            steps{
+                sh 'docker run -itd -p 5000:5000 demopython'
+            }
+        }
+    }
+}
+
+
+
+# Jenkins and Docker setup
+sudo usermod -aG docker jenkins
+sudo systemctl restart jenkins
+sudo ls -l /var/run/docker.sock
+sudo chown root:docker /var/run/docker.sock
+sudo chmod 660 /var/run/docker.sock
